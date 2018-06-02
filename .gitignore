@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+
+# envvironmnt variables 
+.env.addr
