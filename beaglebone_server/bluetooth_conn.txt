@@ -12,8 +12,8 @@ Pair STLB_100_MAC_ADDr
 # GATTTOOL : NOTE: don't connect btooth before gatttool. Gatttool does this for you.
 
 # receive TEMP and PRESSURE data. 
-gatttool -b C0:6E:40:31:2C:48 -t random --char-write-req --handle=0x000f --value=0100 --listen
+gatttool -b BLT_ADDR_HERE -t random --char-write-req --handle=0x000f --value=0100 --listen
 
 # receive ACC DATA
-gatttool -b C0:83:40:31:2C:48 -t random --char-write-req --handle=0x0012 --value=0100 --listen
+gatttool -b BLT_ADDR_HERE -t random --char-write-req --handle=0x0012 --value=0100 --listen
 
