@@ -34,3 +34,6 @@
 
 # envvironmnt variables 
 .env.addr
+
+# nodejs nodemodules.
+node_modules
