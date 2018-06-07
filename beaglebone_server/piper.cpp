@@ -8,6 +8,33 @@
 #define LINE_OFFSET 5 // we start counting from the timestamp.
 using namespace std;
 
+/*
+ *
+ *
+ * Spells that we're doing:
+ *
+ * - Nox
+ * - Lumos
+ * - Expelliarmus
+ * - Stupify
+ * - oppugno
+ * - Arresto Momento
+ *
+ */
+
+/* globals. Already tuned. Do not change unless confident! */
+
+unsigned int tau =150; // 100 is 1 sec
+unsigned int minitau =70;
+unsigned int expelliarmus_tau = 250;
+signed short int z_up_thresh = 1600.0f;//1400.0f;
+signed short int z_down_thresh = 100.0f;
+signed short int xy_idle_thresh = 900.0f;
+
+signed short int x_right_thresh = 1000.0f;//500.0f;
+signed short int x_left_thresh = -600.0f;//-400.0f;
+signed short int yz_idle_thresh = 1500.0f;
+              
 vector<string> split(const string &s, char delim) {
     stringstream ss(s);
     string item;
@@ -49,60 +76,53 @@ unsigned short int getTime(vector<string>& tokens){
   return static_cast<unsigned short int>(d);
 
 }
-int daniel(int state){
-	switch(state) {
-	case 3:
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" NOX. \")' &");
-	case 4:
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" LUMOS. \")' &");
-	case 6:
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" EXPELLIARMUS. \")' &");
-	case 9000:
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" whats up.. \")' &");
-default:
-	cerr<<"piper.cpp:"<<"INVALID DANIEL COMMAND. "<<endl;
-    return 1;
-}
+int daniel(string word){
+    string w = "/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" ";
+    w.append(word);
+    w.append("\")' &");
+	return system(w.c_str());
 }
 
 
-/* globals. Already tuned. Do not change unless confident! */
-unsigned int tau =150;
-signed short int z_up_thresh = 1400.0f;
-signed short int z_down_thresh = 100.0f;
-signed short int xy_idle_thresh = 900.0f;
-
-signed short int x_right_thresh = 500.0f;
-signed short int yz_idle_thresh = 1500.0f;
-              
 int state = 0;
+int previous_state = 0;
 
 /* CODE to change state */
 void changeState(int newState){
+    previous_state= state;
     state = newState;
     cout << "STATECHANGE " << newState << endl;
 switch(state){
 	case 3:
         /* NOX */
-        daniel(3);
+        daniel("NOX");
         cout<<"SUCCESSFUL " << "NOX" << endl;;
         break;
 	case 4:
         /* LUMOS*/
-        daniel(4);
+        daniel("LUMOS");
         cout<<"SUCCESSFUL " << "LUMOS" << endl;;
         break;
 	case 6:
         /* EXPELLIARMUS */
-        daniel(6);
-        cout<<"SUCCESSFUL " << "LUMOS" << endl;;
+        daniel("EXPELLIARMUS");
+        cout<<"SUCCESSFUL " << "EXPELLIARMUS" << endl;;
         break;
+	case 9:
+        /* STUPIFY */
+        daniel("STUPIFY");
+        cout<<"SUCCESSFUL " << "STUPIFY" << endl;;
+        break;
+	case 10:
+        /* APARECUM */
+        daniel("APARECUM");
+        cout<<"SUCCESSFUL " << "APARECUM" << endl;;
     default:
     break;
     }
 }
 int main(){
-	daniel(9000);
+    daniel("starting beaglebone piper.");
     string line;
     unsigned short int msTick = 0;
     int msTickStateChange = 0;
@@ -114,35 +134,33 @@ int main(){
 		signed short int x = getXAccel(tokens);
 		signed short int y = getYAccel(tokens);
 		signed short int z = getZAccel(tokens);
-        cerr<<"piper.cpp:"<<", got x accel : "<<getXAccel(tokens);
-        cerr<<"piper.cpp:"<<" , got y accel : "<<getYAccel(tokens);
-        cerr<<"piper.cpp:"<< " , got z accel : "<<getZAccel(tokens);
-        cerr<<"piper.cpp:"<< " , state :  "<<state<<endl;
+        cerr<<" piper.cpp: "<<", got x accel : "<<getXAccel(tokens);
+        cerr<<" piper.cpp: "<<" , got y accel : "<<getYAccel(tokens);
+        cerr<<" piper.cpp: "<< " , got z accel : "<<getZAccel(tokens);
+        cerr<<" piper.cpp: "<< " , state :  "<<state<<endl;
         msTick = getTime(tokens);
          if(state == 0 && (z > z_up_thresh) && fabs(x) < xy_idle_thresh && fabs(y) < xy_idle_thresh){
               cerr<<"piper.cpp:"<<" STATE 0 -> STATE 1 "<<endl;
-              // state = 1;
               changeState(1);
               msTickStateChange = msTick;
+
           }else if (state == 0 && z < z_down_thresh && fabs(x) < xy_idle_thresh && fabs(y) < xy_idle_thresh){
               cerr<<"piper.cpp:"<<" STATE 0 -> STATE 2 "<<endl;
-              //state = 2;
               changeState(2);
               msTickStateChange = msTick;
+
           }else if (state == 1 && z < 0.05*z_up_thresh){
               cerr<<"piper.cpp:"<<" STATE 1 -> STATE 3. NOXXXX"<<endl;
               msTickStateChange = msTick;
-              // state = 3;
               changeState(3);
               //TODO LED ON for NOX
-            //daniel(state);
+
           }else if (state == 2 && z > 0.05*z_up_thresh){
               cerr<<"piper.cpp:"<<" STATE 2 -> STATE 4. LUMOSS "<<endl;
               msTickStateChange = msTick;
-              // state = 4;
               changeState(4);
               //TODO LED ON for LUMOS
-            //daniel(state);
+              
           }else if ((state == 2 || state == 1)
                   && ((fabs(y) > xy_idle_thresh || fabs(x) > xy_idle_thresh)
                           ||  (( msTick - msTickStateChange) > tau))
@@ -151,29 +169,53 @@ int main(){
               cerr<<"piper.cpp:"<<" STATE "<<state<<"going back to 0 .  "<<endl;
               msTickStateChange = msTick;
               changeState(0);
-              // state = 0;
+
           }else if ((state == 3 || state == 4 || state == 6) && (( msTick - msTickStateChange) > tau)){
               cerr<<"piper.cpp:"<<" STATE "<<state<<"going back to 0 .  "<<endl;
               msTickStateChange = msTick;
-              // state = 0;
               changeState(0);
-          }else if(state == 0 && x >= x_right_thresh && fabs(y) < yz_idle_thresh && fabs(z) < yz_idle_thresh){
-              cerr<<"piper.cpp:"<<" STATE 0 going to STATE 5.  "<<endl;
+
+              // TODO: reuse the below to go from 0 to 5 OR stupify.
+          }else if((state == 0 || state == /* STUPIFY AFTER DIAG DOWN STATE */7  )&& x >= x_right_thresh && fabs(y) < yz_idle_thresh && fabs(z) < yz_idle_thresh){
               msTickStateChange = msTick;
-              // state = 5;
-              changeState(5);
+              if (state == 7) {
+                  changeState(8);
+                  cerr<<"piper.cpp:"<<" STATE 7 going to STATE 8. "<<endl;
+              }
+              else{
+                  changeState(5);
+                  cerr<<"piper.cpp:"<<" STATE 0 going to STATE 5.  "<<endl;
+              }
+
           }else if(state == 5 && z < z_down_thresh && fabs(x) < xy_idle_thresh && fabs(y) < xy_idle_thresh ){
               cerr<<"piper.cpp:"<<" STATE 5 going to STATE 6. EXPELLIARMUSSSS  "<<endl;
               msTickStateChange = msTick;
               changeState(6);
-              // state = 6;
               //  //TODO LED ON for EXPELLIARMUS
-              //daniel(state);
-          }else if ((state ) == 5 && ((fabs(y) > yz_idle_thresh || fabs(z) > yz_idle_thresh) || (( msTick - msTickStateChange) > tau))){
+
+          }else if ((state ) == 5 && ((fabs(y) > yz_idle_thresh || fabs(z) > yz_idle_thresh) || (( msTick - msTickStateChange) > expelliarmus_tau))){
               cerr<<"piper.cpp:"<<" STATE 5 going to STATE 0. EXPELLIARMUS failed."<<endl;
               msTickStateChange = msTick;
               changeState(0);
-              // state = 0;
-          }
+          }else if ((state) != 0  && state != 5 &&( msTick - msTickStateChange) > tau) {
+              cerr<<"piper.cpp:"<<" STATE "<< state<< " going to STATE 0. ."<<endl;
+              msTickStateChange = msTick;
+              changeState(0);
+          
+          }else if ((state) == 8 &&( msTick - msTickStateChange) > minitau) {
+              cerr<<"piper.cpp:"<<" STATE 8 going to STATE 9: STUPIFY!!!."<<endl;
+              msTickStateChange = msTick;
+              changeState(9);
+          }else if ((state) == 0 && x< x_left_thresh && z< z_down_thresh && fabs(y) < yz_idle_thresh) {
+              cerr<<"piper.cpp:"<<" STATE 0 going to STATE 7 ."<<endl;
+              msTickStateChange = msTick;
+              changeState(7);
+
+          }else if ((state) == 8 && x < x_left_thresh && z > z_up_thresh) {
+              cerr<<"piper.cpp:"<<" STATE 8 going to STATE 10: APARECUM!!!."<<endl;
+              msTickStateChange = msTick;
+              changeState(10);
+
+            }
     }
 }
