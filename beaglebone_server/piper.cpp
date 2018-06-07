@@ -8,7 +8,6 @@
 #define LINE_OFFSET 5 // we start counting from the timestamp.
 using namespace std;
 
-
 vector<string> split(const string &s, char delim) {
     stringstream ss(s);
     string item;
@@ -85,13 +84,19 @@ void changeState(int newState){
 switch(state){
 	case 3:
         /* NOX */
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" NOX. \")' &");
+        daniel(3);
+        cout<<"SUCCESSFUL " << "NOX" << endl;;
+        break;
 	case 4:
         /* LUMOS*/
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" LUMOS. \")' &");
+        daniel(4);
+        cout<<"SUCCESSFUL " << "LUMOS" << endl;;
+        break;
 	case 6:
         /* EXPELLIARMUS */
-	return system("/usr/bin/festival -b '(voice_cmu_us_slt_arctic_hts)' '(SayText \" EXPELLIARMUS. \")' &");
+        daniel(6);
+        cout<<"SUCCESSFUL " << "LUMOS" << endl;;
+        break;
     default:
     break;
     }
@@ -130,14 +135,14 @@ int main(){
               // state = 3;
               changeState(3);
               //TODO LED ON for NOX
-            daniel(state);
+            //daniel(state);
           }else if (state == 2 && z > 0.05*z_up_thresh){
               cerr<<"piper.cpp:"<<" STATE 2 -> STATE 4. LUMOSS "<<endl;
               msTickStateChange = msTick;
               // state = 4;
               changeState(4);
               //TODO LED ON for LUMOS
-            daniel(state);
+            //daniel(state);
           }else if ((state == 2 || state == 1)
                   && ((fabs(y) > xy_idle_thresh || fabs(x) > xy_idle_thresh)
                           ||  (( msTick - msTickStateChange) > tau))
@@ -163,7 +168,7 @@ int main(){
               changeState(6);
               // state = 6;
               //  //TODO LED ON for EXPELLIARMUS
-              daniel(state);
+              //daniel(state);
           }else if ((state ) == 5 && ((fabs(y) > yz_idle_thresh || fabs(z) > yz_idle_thresh) || (( msTick - msTickStateChange) > tau))){
               cerr<<"piper.cpp:"<<" STATE 5 going to STATE 0. EXPELLIARMUS failed."<<endl;
               msTickStateChange = msTick;
