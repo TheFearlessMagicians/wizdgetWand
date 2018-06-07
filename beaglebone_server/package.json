@@ -1,0 +1,16 @@
+{
+  "name": "beaglebone_server",
+  "version": "1.0.0",
+  "description": "Node js Back end for harry potter wand eng 96 C project. piper program stdout to be piped to nodejs",
+  "main": "node_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "fearless magicians",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "socket.io": "^2.1.1"
+  }
+}
