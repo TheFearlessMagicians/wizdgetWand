@@ -140,6 +140,7 @@
             });
             socket.on(EVENTS.STATECHANGE, function (data) {
                 console.log(data);
+                console.log("STATE CHANGE");
                 $('#state').text(`STATE: ${data.state}`);
             });
         }
