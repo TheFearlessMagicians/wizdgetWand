@@ -1,8 +1,12 @@
 const express = require('express');
+const ejs = require('ejs');
 const readline = require('readline'); // to get data from our c++ piper.
 const io = require('socket.io')();
 const app = express();
+const path = require('path');
 app.set('view engine','ejs');
+app.set('views', path.join(__dirname, '/views'));
+app.use("/public", express.static(path.join(__dirname, 'public')));
 app.set('port',process.env.PORT || 3000);
 
 const server = app.listen(app.get('port'));
@@ -25,13 +29,13 @@ rl.on('line', (input) => {
 
       if(wandevent === EVENTS.STATECHANGE){
       //TODO: do state change stuff here.      
-      console.log(`WAND EVENT STATE CHANGE TO ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${input.split(DELIMITER)[1]}`);
       io.emit(EVENTS.STATECHANGE,{state: specifier});
       }
 
       if (wandevent === EVENTS.SUCCESSFUL) {
       //TODO: do wandevent successful stuff here.
-      console.log(`WAND Event SUCCESSFUL ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${input.split(DELIMITER)[1]}`);
       io.emit(EVENTS.SUCCESSFUL,{state: specifier});
       }
 
@@ -46,5 +50,12 @@ app.get('/',(req,res)=>{
     });
 
 });
-io.on('connect',(socket)=>{
+
+//Socket.io events for emiting x, y and z cordinates
+io.on('connection',(socket)=>{
 });
+
+/*let test = setInterval(() => { 
+    io.emit(EVENTS.STATECHANGE, { state: "Sketch" });
+}, 2000);
+*/
