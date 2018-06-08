@@ -27,12 +27,12 @@ using namespace std;
 unsigned int tau =150; // 100 is 1 sec
 unsigned int minitau =70;
 unsigned int expelliarmus_tau = 250;
-signed short int z_up_thresh = 1600.0f;//1400.0f;
+signed short int z_up_thresh = 1500.0f;//1400.0f;
 signed short int z_down_thresh = 100.0f;
 signed short int xy_idle_thresh = 900.0f;
 
 signed short int x_right_thresh = 1000.0f;//500.0f;
-signed short int x_left_thresh = -600.0f;//-400.0f;
+signed short int x_left_thresh = -200.0f;//-400.0f;
 signed short int yz_idle_thresh = 1500.0f;
               
 vector<string> split(const string &s, char delim) {
