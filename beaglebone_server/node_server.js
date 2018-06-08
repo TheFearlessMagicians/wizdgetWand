@@ -21,7 +21,7 @@ const rl = readline.createInterface({
 });
 
 rl.on('line', (input) => {
-      console.log(`Received: ${put}`);
+      console.log(`Received: ${input}`);
       // PARSE line to get what happened.
       // UPDATE our viewers here.
       const wandevent = input.split(DELIMITER)[0];
@@ -29,13 +29,13 @@ rl.on('line', (input) => {
 
       if(wandevent === EVENTS.STATECHANGE){
       //TODO: do state change stuff here.      
-      console.log(`WAND EVENT STATE CHANGE TO ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${input.split(DELIMITER)[1]}`);
       io.emit(EVENTS.STATECHANGE,{state: specifier});
       }
 
       if (wandevent === EVENTS.SUCCESSFUL) {
       //TODO: do wandevent successful stuff here.
-      console.log(`WAND Event SUCCESSFUL ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${input.split(DELIMITER)[1]}`);
       io.emit(EVENTS.SUCCESSFUL,{state: specifier});
       }
 
@@ -55,6 +55,7 @@ app.get('/',(req,res)=>{
 io.on('connection',(socket)=>{
 });
 
-let test = setInterval(() => { 
+/*let test = setInterval(() => { 
     io.emit(EVENTS.STATECHANGE, { state: "Sketch" });
 }, 2000);
+*/
