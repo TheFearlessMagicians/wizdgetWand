@@ -1,8 +1,12 @@
 const express = require('express');
+const ejs = require('ejs');
 const readline = require('readline'); // to get data from our c++ piper.
 const io = require('socket.io')();
 const app = express();
+const path = require('path');
 app.set('view engine','ejs');
+app.set('views', path.join(__dirname, '/views'));
+app.use("/public", express.static(path.join(__dirname, 'public')));
 app.set('port',process.env.PORT || 3000);
 
 const server = app.listen(app.get('port'));
@@ -17,7 +21,7 @@ const rl = readline.createInterface({
 });
 
 rl.on('line', (input) => {
-      console.log(`Received: ${input}`);
+      console.log(`Received: ${put}`);
       // PARSE line to get what happened.
       // UPDATE our viewers here.
       const wandevent = input.split(DELIMITER)[0];
@@ -46,5 +50,11 @@ app.get('/',(req,res)=>{
     });
 
 });
-io.on('connect',(socket)=>{
+
+//Socket.io events for emiting x, y and z cordinates
+io.on('connection',(socket)=>{
 });
+
+let test = setInterval(() => { 
+    io.emit(EVENTS.STATECHANGE, { state: "Sketch" });
+}, 2000);
