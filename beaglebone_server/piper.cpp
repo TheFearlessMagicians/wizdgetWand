@@ -34,6 +34,7 @@ signed short int xy_idle_thresh = 900.0f;
 signed short int x_right_thresh = 1000.0f;//500.0f;
 signed short int x_left_thresh = -200.0f;//-400.0f;
 signed short int yz_idle_thresh = 1500.0f;
+signed short int z_idle_thresh_expelliarmus= yz_idle_thresh * 1.4;
               
 vector<string> split(const string &s, char delim) {
     stringstream ss(s);
@@ -122,7 +123,7 @@ switch(state){
     }
 }
 int main(){
-    daniel("starting beaglebone piper.");
+    daniel("starting beaglebone C++ .");
     string line;
     unsigned short int msTick = 0;
     int msTickStateChange = 0;
@@ -130,14 +131,14 @@ int main(){
         vector<string> tokens = split(line,' ');
         if(tokens.size() < 10)
             continue;
-        cerr<<"piper.cpp:"<<"time: "<<getTime(tokens);
+        cerr<<"piper.cpp: "<<"time: "<<getTime(tokens);
 		signed short int x = getXAccel(tokens);
 		signed short int y = getYAccel(tokens);
 		signed short int z = getZAccel(tokens);
-        cerr<<" piper.cpp: "<<", got x accel : "<<getXAccel(tokens);
-        cerr<<" piper.cpp: "<<" , got y accel : "<<getYAccel(tokens);
-        cerr<<" piper.cpp: "<< " , got z accel : "<<getZAccel(tokens);
-        cerr<<" piper.cpp: "<< " , state :  "<<state<<endl;
+        cerr<<", got x accel: "<<getXAccel(tokens);
+        cerr <<", got y accel: "<<getYAccel(tokens);
+        cerr<< ", got z accel: "<<getZAccel(tokens);
+        cerr<< ", state: "<<state<<endl;
         msTick = getTime(tokens);
          if(state == 0 && (z > z_up_thresh) && fabs(x) < xy_idle_thresh && fabs(y) < xy_idle_thresh){
               cerr<<"piper.cpp:"<<" STATE 0 -> STATE 1 "<<endl;
@@ -193,7 +194,8 @@ int main(){
               changeState(6);
               //  //TODO LED ON for EXPELLIARMUS
 
-          }else if ((state ) == 5 && ((fabs(y) > yz_idle_thresh || fabs(z) > yz_idle_thresh) || (( msTick - msTickStateChange) > expelliarmus_tau))){
+          }else if ((state ) == 5 && ((fabs(y) > yz_idle_thresh || fabs(z) >  z_idle_thresh_expelliarmus)|| (( msTick - msTickStateChange) > expelliarmus_tau))){
+                                            // NOTEDIFF: z idling condition above is made higher.. This is because expelliarmus typically will need some z motion
               cerr<<"piper.cpp:"<<" STATE 5 going to STATE 0. EXPELLIARMUS failed."<<endl;
               msTickStateChange = msTick;
               changeState(0);
