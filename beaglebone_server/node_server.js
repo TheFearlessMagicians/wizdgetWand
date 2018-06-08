@@ -4,14 +4,14 @@ const readline = require('readline'); // to get data from our c++ piper.
 const io = require('socket.io')();
 const app = express();
 const path = require('path');
-app.set('view engine','ejs');
+app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use("/public", express.static(path.join(__dirname, 'public')));
-app.set('port',process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3000);
 
 const server = app.listen(app.get('port'));
 
-const DELIMITER=" ";
+const DELIMITER = " ";
 
 const EVENTS = {
     STATECHANGE: 'STATECHANGE', // STATE TREE state change
@@ -20,60 +20,48 @@ const EVENTS = {
 };
 
 const rl = readline.createInterface({
-      input: process.stdin,
+    input: process.stdin,
 });
 
 rl.on('line', (input) => {
-        let data = input.split(DELIMITER)
-      if (data.length === 3){
-          io.emit(EVENTS.DATA, {
-              x: data[0],
-              y: data[1],
-              z: data[2],
-          }); 
-          return;
-      }
-      // PARSE line to get what happened.
-      // UPDATE our viewers here.
-      const wandevent = data[0];
-      const specifier = data[1];
+    console.log(`Received: ${input}`);
+    let data = input.split(DELIMITER)
+    if (data.length === 3) {
+        io.emit(EVENTS.DATA, {
+            x: data[0],
+            y: data[1],
+            z: data[2],
+        });
+    }
+    // PARSE line to get what happened.
+    // UPDATE our viewers here.
+    else {
+        const wandevent = data[0];
+        const specifier = data[1];
 
-      if(wandevent === EVENTS.STATECHANGE){
-      //TODO: do state change stuff here.      
-      console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${specifier}`);
-      io.emit(EVENTS.STATECHANGE,{state: specifier});
-      }
+        if (wandevent === EVENTS.STATECHANGE) {
+            //TODO: do state change stuff here.      
+            console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${data[1]}`);
+            io.emit(EVENTS.STATECHANGE, { state: specifier });
+        }
 
-      if (wandevent === EVENTS.SUCCESSFUL) {
-      //TODO: do wandevent successful stuff here.
-      console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${specifier}`);
-      io.emit(EVENTS.SUCCESSFUL,{state: specifier});
-      }
-
+        if (wandevent === EVENTS.SUCCESSFUL) {
+            //TODO: do wandevent successful stuff here.
+            console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${data[1]}`);
+            io.emit(EVENTS.SUCCESSFUL, { state: specifier });
+        }
+    }
 });
 
 console.log('node server listening on 127.0.0.1:3000');
 
 io.attach(server);
 
-app.get('/',(req,res)=>{
-    res.render('main',{
+app.get('/', (req, res) => {
+    res.render('main', {
     });
 });
 
 //Socket.io events for emiting x, y and z cordinates
-io.on('connection',(socket)=>{
+io.on('connection', (socket) => {
 });
-
-/*
-setInterval(() => { 
-    io.emit(EVENTS.SUCCESSFUL, { state: "IMPOSTRIUS" });
-    // io.emit(EVENTS.DATA, {
-    //     x: Math.random(1)*2000,
-    //     y: Math.random(1)*2000,
-    //     z: Math.random(1)*2000,
-    // });
-    console.log("sent");
-}, 4000);
-
-*/
