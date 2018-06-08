@@ -19,7 +19,7 @@ using namespace std;
  * - Stupify
  * - oppugno
  * - Arresto Momento
- *
+ * - Impostrious
  */
 
 /* globals. Already tuned. Do not change unless confident! */
@@ -118,8 +118,11 @@ switch(state){
         /* APARECUM */
         daniel("APARECUM");
         cout<<"SUCCESSFUL " << "APARECUM" << endl;;
-    default:
     break;
+	case 13:
+        /* IMPOSTRIUS*/
+        daniel("IMPOSTRIUS");
+        cout<<"SUCCESSFUL " << "IMPOSTRIUS" << endl;;
     }
 }
 int main(){
@@ -177,6 +180,10 @@ int main(){
               changeState(0);
 
               // TODO: reuse the below to go from 0 to 5 OR stupify.
+          }else if ((state) == 0 && x > x_right_thresh && z < z_down_thresh) {
+              cerr << "piper.cpp:" <<" STATE 0 going to STATE 11: "<<endl;
+              msTickStateChange = msTick;
+              changeState(11);
           }else if((state == 0 || state == /* STUPIFY AFTER DIAG DOWN STATE */7  )&& x >= x_right_thresh && fabs(y) < yz_idle_thresh && fabs(z) < yz_idle_thresh){
               msTickStateChange = msTick;
               if (state == 7) {
@@ -218,6 +225,18 @@ int main(){
               msTickStateChange = msTick;
               changeState(10);
 
-            }
-    }
+          }else if ((state) == 0 && x > x_right_thresh && z < z_down_thresh) {
+              cerr << "piper.cpp:" <<" STATE 0 going to STATE 11: "<<endl;
+              msTickStateChange = msTick;
+              changeState(11);
+          }else if ((state) == 11 && z > z_up_thresh ){
+              cerr << "piper.cpp:" <<" STATE 11 going to STATE 12: " << endl;
+              msTickStateChange = msTick;
+              changeState(12);
+          }else if ((state) == 12 && z < z_down_thresh && x < x_left_thresh){
+              cerr << "piper.cpp:" << " STATE 12 going to STATE 13: IMPOSTRIUS!!!" << endl;
+              msTickStateChange = msTick;
+              changeState(13);
+          }   
+ }    
 }
