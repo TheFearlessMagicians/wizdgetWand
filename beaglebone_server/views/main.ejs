@@ -1,7 +1,8 @@
 <html>
+<link href='https://fonts.googleapis.com/css?family=Aclonica' rel='stylesheet'>
 
 <body>
-    <h2>
+    <h2 style="font: Aclonica">
         <center> Wizdget Wand </center>
     </h2>
     <script src="/socket.io/socket.io.js"></script>
@@ -13,26 +14,63 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/addons/p5.sound.js" type="text/javascript" charset="utf-8"
         async defer></script>
+        <div style="display: flex; flex-direction:column; align-items:center;">
+            <div style="display:flex; flex-direction: row;">
+        <div id="gaugeChartX" class="epoch gauge-large"></div>
+        <div id="gaugeChartY" class="epoch gauge-large"></div>
+        <div id="gaugeChartZ" class="epoch gauge-large"></div>
+    </div>
+    <br>
+    <br>
+    <div style="display:flex; flex-direction: row;">
 
+        <div id="p5Parent" style="display: inline-block"></div>
+    </div>
+    </div>
     <script>
         const EVENTS = {
             STATECHANGE: 'STATECHANGE', // STATE TREE state change SUCCESSFUL: 'SUCCESSFUL', // WHEN WE SUCCESSFULLY
             SUCCESSFUL: 'SUCCESSFUL', // WHEN WE SUCCESSFULLY casted a spell.
+            DATA: 'DATA',
         };
 
-        var socket = io('http://localhost:3000');
-        socket.on('dataToGraph', function (data) {
-            myChart.push([{
-                time: (new Date).getMinutes(),
-                y: Number(data)
-            }]);
-            myGauge.push(Number(data));
+        var myGaugeX = $('#gaugeChartX').epoch({
+            type: 'time.gauge',
+            ticks: 6,
+            format: (v) => {
+                return "X: " + Math.round((v / 1000) * 100) / 100 + 'g';
+            },
+            tickSize: 10,
+            tickOffset: 10,
+            domain: [-3000, 3000]
         });
 
-        const radiusDecrement = 4;
+        var myGaugeY = $('#gaugeChartY').epoch({
+            type: 'time.gauge',
+            ticks: 6,
+            format: (v) => {
+                return "Y: " + Math.round((v / 1000) * 100) / 100 + 'g';
+            },
+            tickSize: 10,
+            tickOffset: 10,
+            domain: [-3000, 3000]
+        });
+
+        var myGaugeZ = $('#gaugeChartZ').epoch({
+            type: 'time.gauge',
+            ticks: 6,
+            format: (v) => {
+                return "Z: " + Math.round((v / 1000) * 100) / 100 + 'g';
+            },
+            tickSize: 10,
+            tickOffset: 10,
+            domain: [-3000, 3000]
+        });
+
+        var socket = io('http://localhost:3000');
+        const radiusDecrement = 6;
         const sizeX = Number(document.documentElement.clientWidth) / 2;
         const sizeY = Number(document.documentElement.clientHeight) / 2;
-
         const fr = 20;
         const initialDiameter = sizeX / 2;
         const decayRate = initialDiameter / radiusDecrement; //the iterations it takes for the dimater --> 0
@@ -45,6 +83,15 @@
         let song3;
         let song4;
         let song5;
+
+        const spellToPattern = {
+            "NOX": 0,
+            "LUMOS": 1,
+            "EXPELLIARMUS": 2,
+            "STUPIFY": 3,
+            "APERACUM": 4,
+            "IMPOSTRIUS": 5
+        }
 
         function preload() {
             song0 = loadSound("/public/sounds/bubbles.mp3");
@@ -65,18 +112,28 @@
         }
 
         function setup() {
-            createCanvas(sizeX, sizeY);
+            var p5Canvas = createCanvas(sizeX, sizeY);
+            p5Canvas.parent("#p5Parent");
             frameRate(fr);
             noStroke();
-        }
 
-        socket.on(EVENTS.SUCCESSFUL, (data) => {
-            console.log('received');
-            console.log('circle patterns : '+JSON.stringify(circlePatterns));
-            let temp = [circlePatterns[0][0], (sizeX) / 2, (sizeY) / 2, initialDiameter, data.state, decayRate];
-            arr.push(temp);
-            // circlePatterns[0][1].play();
-        });
+            socket.on(EVENTS.SUCCESSFUL, (data) => {
+                console.log('received');
+                let spellNum = spellToPattern[data.state] || 0;
+                let temp = [circlePatterns[spellNum][0], (sizeX) / 2, (sizeY) / 2, initialDiameter, data.state,
+                    decayRate
+                ];
+                arr.push(temp);
+                circlePatterns[spellNum][1].play();
+            });
+
+            socket.on(EVENTS.DATA, function (data) {
+                console.log(data);
+                myGaugeX.push(Number(data.x));
+                myGaugeY.push(Number(data.y));
+                myGaugeZ.push(Number(data.z));
+            });
+        }
 
 
         function draw() {
@@ -97,11 +154,7 @@
             }
         }
     </script>
-
-
-    <script>
-    </script>
-
 </body>
+
 
 </html>

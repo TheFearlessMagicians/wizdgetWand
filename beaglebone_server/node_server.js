@@ -12,16 +12,27 @@ app.set('port',process.env.PORT || 3000);
 const server = app.listen(app.get('port'));
 
 const DELIMITER=" ";
+
 const EVENTS = {
     STATECHANGE: 'STATECHANGE', // STATE TREE state change
     SUCCESSFUL: 'SUCCESSFUL',   // WHEN WE SUCCESSFULLY casted a spell.
+    DATA: 'DATA',
 };
+
 const rl = readline.createInterface({
       input: process.stdin,
 });
 
 rl.on('line', (input) => {
       console.log(`Received: ${input}`);
+        let data = input.split()
+      if (data.length === 3){
+          io.emit(EVENTS.DATA, {
+              x: data[0],
+              y: data[1],
+              z: data[2],
+          }); 
+      }
       // PARSE line to get what happened.
       // UPDATE our viewers here.
       const wandevent = input.split(DELIMITER)[0];
@@ -48,14 +59,19 @@ io.attach(server);
 app.get('/',(req,res)=>{
     res.render('main',{
     });
-
 });
 
 //Socket.io events for emiting x, y and z cordinates
 io.on('connection',(socket)=>{
 });
 
-/*let test = setInterval(() => { 
-    io.emit(EVENTS.STATECHANGE, { state: "Sketch" });
-}, 2000);
-*/
+setInterval(() => { 
+    io.emit(EVENTS.SUCCESSFUL, { state: "IMPOSTRIUS" });
+    // io.emit(EVENTS.DATA, {
+    //     x: Math.random(1)*2000,
+    //     y: Math.random(1)*2000,
+    //     z: Math.random(1)*2000,
+    // });
+    console.log("sent");
+}, 4000);
+
