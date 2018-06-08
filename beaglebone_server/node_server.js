@@ -24,29 +24,29 @@ const rl = readline.createInterface({
 });
 
 rl.on('line', (input) => {
-      console.log(`Received: ${input}`);
-        let data = input.split()
+        let data = input.split(DELIMITER)
       if (data.length === 3){
           io.emit(EVENTS.DATA, {
               x: data[0],
               y: data[1],
               z: data[2],
           }); 
+          return;
       }
       // PARSE line to get what happened.
       // UPDATE our viewers here.
-      const wandevent = input.split(DELIMITER)[0];
-      const specifier = input.split(DELIMITER)[1];
+      const wandevent = data[0];
+      const specifier = data[1];
 
       if(wandevent === EVENTS.STATECHANGE){
       //TODO: do state change stuff here.      
-      console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND EVENT STATE CHANGE TO ${specifier}`);
       io.emit(EVENTS.STATECHANGE,{state: specifier});
       }
 
       if (wandevent === EVENTS.SUCCESSFUL) {
       //TODO: do wandevent successful stuff here.
-      console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${input.split(DELIMITER)[1]}`);
+      console.log(`NODE_SERVER: WAND Event SUCCESSFUL ${specifier}`);
       io.emit(EVENTS.SUCCESSFUL,{state: specifier});
       }
 
@@ -65,6 +65,7 @@ app.get('/',(req,res)=>{
 io.on('connection',(socket)=>{
 });
 
+/*
 setInterval(() => { 
     io.emit(EVENTS.SUCCESSFUL, { state: "IMPOSTRIUS" });
     // io.emit(EVENTS.DATA, {
@@ -75,3 +76,4 @@ setInterval(() => {
     console.log("sent");
 }, 4000);
 
+*/

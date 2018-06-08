@@ -28,6 +28,8 @@
     </div>
     </div>
     <script>
+        const range = 1200;
+        const domain = [-range,range];
         const EVENTS = {
             STATECHANGE: 'STATECHANGE', // STATE TREE state change SUCCESSFUL: 'SUCCESSFUL', // WHEN WE SUCCESSFULLY
             SUCCESSFUL: 'SUCCESSFUL', // WHEN WE SUCCESSFULLY casted a spell.
@@ -42,7 +44,7 @@
             },
             tickSize: 10,
             tickOffset: 10,
-            domain: [-3000, 3000]
+            domain: domain
         });
 
         var myGaugeY = $('#gaugeChartY').epoch({
@@ -53,7 +55,7 @@
             },
             tickSize: 10,
             tickOffset: 10,
-            domain: [-3000, 3000]
+            domain: domain
         });
 
         var myGaugeZ = $('#gaugeChartZ').epoch({
@@ -64,10 +66,10 @@
             },
             tickSize: 10,
             tickOffset: 10,
-            domain: [-3000, 3000]
+            domain: domain
         });
 
-        var socket = io('http://localhost:3000');
+        var socket = io();
         const radiusDecrement = 6;
         const sizeX = Number(document.documentElement.clientWidth) / 2;
         const sizeY = Number(document.documentElement.clientHeight) / 2;

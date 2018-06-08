@@ -134,13 +134,14 @@ int main(){
         vector<string> tokens = split(line,' ');
         if(tokens.size() < 10)
             continue;
-        cerr<<"piper.cpp: "<<"time: "<<getTime(tokens);
+        cerr<<"piper.cpp: "<<"time: "<<getTime(tokens)<<" x y z: ";
 		signed short int x = getXAccel(tokens);
 		signed short int y = getYAccel(tokens);
 		signed short int z = getZAccel(tokens);
-        cerr<<", got x accel: "<<getXAccel(tokens);
-        cerr <<", got y accel: "<<getYAccel(tokens);
-        cerr<< ", got z accel: "<<getZAccel(tokens);
+        cout<<x<<" "<<y<<" "<<z<<endl;
+        //cerr<<", got x accel: "<<getXAccel(tokens);
+        //cerr <<", got y accel: "<<getYAccel(tokens);
+        //cerr<< ", got z accel: "<<getZAccel(tokens);
         cerr<< ", state: "<<state<<endl;
         msTick = getTime(tokens);
          if(state == 0 && (z > z_up_thresh) && fabs(x) < xy_idle_thresh && fabs(y) < xy_idle_thresh){

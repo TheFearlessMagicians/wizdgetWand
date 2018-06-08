@@ -1,1 +1,0 @@
- g++ -O2 piper.cpp -o piper && gatttool -b "$(cat .env.addr)" -t random --char-write-req --handle=0x0012 --value=0100 --listen | ./piper | node node_server.js
