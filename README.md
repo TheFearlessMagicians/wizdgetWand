@@ -1,6 +1,7 @@
 # 2018 Spring Engineering 96C Project proposal  - Harry Potter Wand
 
 Team members: Wilson Jusuf, Varun Narayanan & Hanif Lim
+
 Please see accompanying presentation: https://github.com/TheFearlessMagicians/wizdgetWand/blob/master/E96_Final_Presentation_WizdgetWand.ppt
 
 
